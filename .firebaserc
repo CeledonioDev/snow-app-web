@@ -1,0 +1,20 @@
+{
+  "projects": {
+    "default": "nieveseats"
+  },
+  "targets": {
+    "nieveseats": {
+      "hosting": {
+        "snow-app-web": [
+          "snow-app-web.firebaseapp.com"
+        ],
+        "v2": [
+          "snow-app-web"
+        ],
+        "v1": [
+          "nieveseats"
+        ]
+      }
+    }
+  }
+}

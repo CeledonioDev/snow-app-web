@@ -114,6 +114,9 @@ export default {
       .get();
     },
 
+    openAddProductModal: function(company){
+
+    }
   },
   mounted: function(){
     this.getCompanies();
