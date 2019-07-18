@@ -1,0 +1,28 @@
+{
+  "short_name": "SnowEats",
+  "name": "ShowEats dashboard",
+  "background_color": "#FFFFFF",
+	"theme_color": "#F4F3EF",
+  "display": "standalone",
+	"orientation": "",
+  "icons": [
+		{
+			"src": "assets/img/main_icons/icon_128x128.png",
+			"type": "image/png",
+			"sizes": "128x128"
+		}, {
+			"src": "assets/img/main_icons/icon_152x152.png",
+			"type": "image/png",
+			"sizes": "152x152"
+		}, {
+			"src": "assets/img/main_icons/icon_144x144.png",
+			"type": "image/png",
+			"sizes": "144x144"
+		}, {
+			"src": "assets/img/main_icons/icon_192x192.png",
+			"type": "image/png",
+			"sizes": "192x192"
+		}
+  ],
+  "start_url": "/?utm_source=homescreen"
+}
