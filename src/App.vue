@@ -21,20 +21,32 @@
         <ul class="nav">
           <li :class="$route.name=='home'?'active':''">
             <router-link to="/">
-              <i class="nc-icon nc-bank"></i>
+              <i class="fa fa-dashboard"></i>
               <p>Panel de control</p>
             </router-link>
           </li>
           <li :class="$route.name=='companies'?'active':''">
             <router-link to="/companies">
-              <i class="nc-icon nc-shop"></i>
+              <i class="fa fa-building"></i>
               <p>Afiliados</p>
             </router-link>
           </li>
           <li :class="$route.name=='about'?'active':''">
             <router-link to="/about">
-              <i class="nc-icon nc-shop"></i>
+              <i class="fa fa-shopping-cart"></i>
               <p>Ordenes</p>
+            </router-link>
+          </li>
+          <li :class="$route.name=='products'?'active':''">
+            <router-link to="/about">
+              <i class="fa fa-cutlery"></i>
+              <p>Productos</p>
+            </router-link>
+          </li>
+          <li :class="$route.name=='reports'?'active':''">
+            <router-link to="/about">
+              <i class="fa fa-line-chart"></i>
+              <p>Reportes</p>
             </router-link>
           </li>
         </ul>
