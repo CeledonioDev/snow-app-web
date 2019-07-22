@@ -31,20 +31,20 @@
               <p>Afiliados</p>
             </router-link>
           </li>
-          <li :class="$route.name=='about'?'active':''">
-            <router-link to="/about">
+          <li :class="$route.name=='orders'?'active':''">
+            <router-link to="/orders">
               <i class="fa fa-shopping-cart"></i>
               <p>Ordenes</p>
             </router-link>
           </li>
           <li :class="$route.name=='products'?'active':''">
-            <router-link to="/about">
+            <router-link to="/products">
               <i class="fa fa-cutlery"></i>
               <p>Productos</p>
             </router-link>
           </li>
           <li :class="$route.name=='reports'?'active':''">
-            <router-link to="/about">
+            <router-link to="/reports">
               <i class="fa fa-line-chart"></i>
               <p>Reportes</p>
             </router-link>
@@ -105,7 +105,7 @@
 					<div class="col-md-12">
 						<div class="card">
               <div class="card-body">
-                <vue-page-transition name="fade" style="top: 200px;">
+                <vue-page-transition name="fade" style="">
                   <router-view />
                 </vue-page-transition>
               </div>

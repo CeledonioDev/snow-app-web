@@ -1,31 +1,35 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
+import Companies from './components/CompaniesList.vue'
 
 Vue.use(Router)
 
 export default new Router({
   routes: [
     {
-      path: '/',
+      path: '/companies',
       name: 'home',
-      component: Home
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+      component: Companies
     },
     {
       path: '/companies',
       name: 'companies',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/Companies.vue')
-    }    
+      component: Companies
+    },
+    {
+      path: '/products/',
+      name: 'products',
+      component: () => import(/* webpackChunkName: "about" */ './components/Products.vue')
+    },
+    {
+      path: '/orders',
+      name: 'orders',
+      component: () => import(/* webpackChunkName: "about" */ './components/Orders.vue')
+    },
+    {
+      path: '/reports',
+      name: 'reports',
+      component: () => import(/* webpackChunkName: "about" */ './components/Reports.vue')
+    }     
   ]
 })

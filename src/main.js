@@ -4,17 +4,9 @@ import router from './router'
 import './registerServiceWorker'
 import VuePageTransition from 'vue-page-transition'
 import firebase from 'firebase'
+import firebaseConfig from './firebaseConfig.js'
 
-const config	= {
-  apiKey: "AIzaSyBpJI22AFwHsFL0QeEo1DE3TuexAxTnVxs",
-  authDomain: "nieveseats.firebaseapp.com",
-  databaseURL: "https://nieveseats.firebaseio.com",
-  projectId: "nieveseats",
-  storageBucket: "nieveseats.appspot.com",
-  messagingSenderId: "187728069073",
-  appId: "1:187728069073:web:c24b2e47c6c785fd"
-}
-firebase.initializeApp(config);
+firebase.initializeApp(firebaseConfig);
 
 Vue.use(VuePageTransition);
 Vue.config.productionTip = false
