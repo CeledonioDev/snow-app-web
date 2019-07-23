@@ -40,7 +40,7 @@ export default {
   },
   data: function() {
     return {
-      company: "makesushibycristino@gmail.com",
+      company: firebase.auth().currentUser.email,
       products: [],
       db: firebase.firestore()
     };

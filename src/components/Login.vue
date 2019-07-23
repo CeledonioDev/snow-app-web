@@ -63,8 +63,8 @@ export default {
         .signInWithEmailAndPassword(this.username, this.password)
         .then(user => {
           this.error = '';
-          console.log("OK ", user);
           this.$emit('logged', user);
+          router.push('/orders');
         })
         .catch(e => {
           this.error = e.message;

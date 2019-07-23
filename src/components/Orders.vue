@@ -44,7 +44,7 @@ export default {
   },
   data: function() {
     return {
-      company: "makesushibycristino@gmail.com",
+      company: firebase.auth().currentUser.email,
       orders: [],
       db: firebase.firestore()
     };

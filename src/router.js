@@ -14,7 +14,7 @@ let router = new Router({
     {
       path: '/',
       name: 'home',
-      component: Companies,
+      component: Orders,
       meta: {
         requiresAuth: true
       }
@@ -60,7 +60,7 @@ let router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  console.log(to);
+  //console.log(to);
   if(to.matched.some(record => record.meta.requiresAuth)){
     if(!firebase.auth().currentUser){
       next({

@@ -9,8 +9,8 @@
             </div>
           </a>
 
-          <a href class="simple-text logo-normal">
-            Usuario 1
+          <a href class="simple-text logo-normal" :title="user">
+            {{ user }}
             <!-- <div class="logo-image-big">
             <img src="../assets/img/logo-big.png">
             </div>-->
@@ -19,18 +19,19 @@
 
         <div class="sidebar-wrapper">
           <ul class="nav">
-            <li :class="$route.name=='home'?'active':''">
+            <!-- <li :class="$route.name=='home'?'active':''">
               <router-link to="/">
                 <i class="fa fa-dashboard"></i>
                 <p>Panel de control</p>
               </router-link>
-            </li>
-            <li :class="$route.name=='companies'?'active':''">
+            </li> -->
+            <!-- Comentado hasta encontrar una manera de poner un usuario super admin -->
+            <!-- <li :class="$route.name=='companies'?'active':''">
               <router-link to="/companies">
                 <i class="fa fa-building"></i>
                 <p>Afiliados</p>
               </router-link>
-            </li>
+            </li> -->
             <li :class="$route.name=='orders'?'active':''">
               <router-link to="/orders">
                 <i class="fa fa-shopping-cart"></i>
@@ -80,31 +81,30 @@
               <span class="navbar-toggler-bar navbar-kebab"></span>
               <span class="navbar-toggler-bar navbar-kebab"></span>
             </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navigation">
-              <ul class="navbar-nav">
-                <li class="nav-item btn-rotate dropdown">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    id="navbarDropdownMenuLink"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    <i class="nc-icon nc-bell-55"></i>
-                    <p>
-                      <span class="d-lg-none d-md-block">Herramientas</span>
-                    </p>
-                  </a>
-                  <div
-                    class="dropdown-menu dropdown-menu-right"
-                    aria-labelledby="navbarDropdownMenuLink"
-                  >
-                    <a class="dropdown-item" href="#">Notificaciones</a>
-                  </div>
-                </li>
-              </ul>
-            </div>
+			
+			
+			<div class="collapse navbar-collapse justify-content-end" id="navigation">
+
+				<ul class="navbar-nav">
+
+					<li class="nav-item btn-rotate dropdown">
+
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink"
+							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<i class="fa fa-user"></i>
+							
+						</a>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+							<a class="dropdown-item" href="#"><i class="fa fa-bell"></i>&nbsp;Notificaciones</a>
+							<a class="dropdown-item" href="#"><i class="fa fa-cog"></i>&nbsp;Configuraciones</a>
+						</div>
+					</li>
+
+				</ul>
+				
+			</div>
+			
+			
           </div>
         </nav>
         <!-- End Navbar -->
@@ -127,6 +127,8 @@
 </template>
 
 <script>
+import firebase from 'firebase'
+
 export default {
   name: 'Navbar',
   props: {
@@ -134,12 +136,14 @@ export default {
   },
   data:function(){
     return {
-
+      user: 'USUARIO 1'
     }
   },
-  props: {},
   mounted: function() {
-    console.log('Navbar mounted');
+    let user = firebase.auth().currentUser;
+    if(user){
+      this.user = user.email;
+    }
   }
   
 }
