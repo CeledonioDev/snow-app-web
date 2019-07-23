@@ -1,22 +1,25 @@
 <template>
   <div>
-    <h2>Reportes</h2>
 
-    <button class="btn btn-primary">Ordenes por mes</button>
-    &nbsp;|&nbsp;
-    <button class="btn btn-success">Productos mas vendidos</button>
+    <div class>
+      <h2>Reportes</h2>
 
-    <div class="twrap">
-
+      <button class="btn btn-primary">Ordenes por mes</button>
+      &nbsp;|&nbsp;
+      <button class="btn btn-success">Productos mas vendidos</button>
     </div>
   </div>
 </template>
 
 <script>
 import firebase from "firebase";
+import Navbar from "@/components/Navbar";
 
 export default {
   name: "Reports",
+  components: {
+    Navbar
+  },
   props: {
     company_id: String
   },
@@ -27,20 +30,14 @@ export default {
       db: firebase.firestore()
     };
   },
-  methods: {
-
-
-
-  },
-  mounted: function() {
-    
-  }
+  methods: {},
+  mounted: function() {}
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.twrap{
+.twrap {
   max-height: 300px;
   overflow-y: auto;
 }

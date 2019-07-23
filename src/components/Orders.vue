@@ -32,9 +32,13 @@
 
 <script>
 import firebase from "firebase";
+import Navbar from '@/components/Navbar'
 
 export default {
   name: "Orders",
+  components: {
+    Navbar
+  },
   props: {
     company_id: String
   },
