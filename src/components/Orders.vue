@@ -5,10 +5,10 @@
       <table class="table">
         <thead class="text-primary">
           <th>Fecha</th>
-          <th>Estado</th>
-          <th>Mesa</th>
-          <th>Total</th>
-          <!-- <th>Descripcion</th> -->
+          <th class="text-center">Estado</th>
+          <th class="text-center">Mesa</th>
+          <th class="text-center">Total</th>
+          <th class="text-center">Detalles</th>
         </thead>
         <tbody>
           <tr v-show="orders.length === 0">
@@ -22,7 +22,7 @@
             <td class="text-center">{{ o.status }}</td>
             <td class="text-center">{{ o.table }}</td>
             <td class="text-center">{{ o.total }}</td>
-            <!-- <td class="text-center">{{ o.description }}</td> -->
+            <td class="text-center"><a href="#">Ver</a></td>
           </tr>
         </tbody>
       </table>
