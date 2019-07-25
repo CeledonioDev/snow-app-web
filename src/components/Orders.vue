@@ -50,7 +50,7 @@ export default {
     };
   },
   methods: {
-    getCompanyOrders: async function() {
+    getOrders: async function() {
       const ORDERS = await this.db
         .collection("Company")
         .doc(this.company)
@@ -70,12 +70,12 @@ export default {
 
     formatDate: function(d){
       return typeof d.to_show === 'undefined'
-            ? new Date(d).toLocaleDateString()
+            ? new Date(d).toLocaleString()
             : d.to_show;
     }
   },
   mounted: function() {
-    this.getCompanyOrders();
+    this.getOrders();
   }
 };
 </script>
