@@ -1,22 +1,11 @@
 {
-  "hosting": [
-	{
-	"target":"v2",
+  "hosting": {
+    "target": "v2",
     "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ]
-  },
-  {
-	"target":"nieveseats",
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
   }
-  ]
 }
