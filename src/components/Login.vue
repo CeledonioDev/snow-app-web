@@ -49,7 +49,8 @@ export default {
       password: "",
       db: firebase.firestore(),
       inRequest: false,
-      error: ''
+      error: '',
+      role: 0
     };
   },
   methods: {
@@ -61,9 +62,9 @@ export default {
       firebase
         .auth()
         .signInWithEmailAndPassword(this.username, this.password)
-        .then(user => {
+        .then(async user => {
           this.error = '';
-          this.checkModulesConfiguration();
+          await this.checkModulesConfiguration();
         })
         .catch(e => {
           this.error = e.message;
@@ -100,6 +101,8 @@ export default {
                     .get();
 
       let tempModules = LIST.data().ModuleConfiguration;
+      
+      this.role = LIST.data().Role || 0;
 
       const NAMES = await this
                     .db.collection('Modules')
