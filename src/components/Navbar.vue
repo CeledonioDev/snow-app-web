@@ -32,22 +32,32 @@
                 <p>Afiliados</p>
               </router-link>
             </li> -->
-            <li :class="$route.name=='orders'?'active':''">
+            <li v-if="userModules.indexOf('Orders') !== -1"  
+              :class="$route.name=='orders'?'active':''">
               <router-link to="/orders">
                 <i class="fa fa-shopping-cart"></i>
                 <p>Ordenes</p>
               </router-link>
             </li>
-            <li :class="$route.name=='products'?'active':''">
+            <li v-if="userModules.indexOf('Products') !== -1"  
+              :class="$route.name=='products'?'active':''">
               <router-link to="/products">
                 <i class="fa fa-cutlery"></i>
                 <p>Productos</p>
               </router-link>
             </li>
-            <li :class="$route.name=='reports'?'active':''">
+            <li v-if="userModules.indexOf('Reports') !== -1" 
+              :class="$route.name=='reports'?'active':''">
               <router-link to="/reports">
                 <i class="fa fa-line-chart"></i>
                 <p>Reportes</p>
+              </router-link>
+            </li>
+            <li v-if="userModules.indexOf('Inventory') !== -1"
+              :class="$route.name=='inventory'?'active':''">
+              <router-link to="/products">
+                <i class="fa fa-building"></i>
+                <p>Inventario</p>
               </router-link>
             </li>
           </ul>
@@ -132,13 +142,18 @@ import firebase from 'firebase'
 export default {
   name: 'Navbar',
   props: {
-    //module: String
+    userModules: Array
   },
   data:function(){
     return {
       user: 'USUARIO 1'
     }
   },
+
+  beforeMount: function(){
+    console.log('from navbar userModules >> ',this.userModules);
+  },
+
   mounted: function() {
     let user = firebase.auth().currentUser;
     if(user){

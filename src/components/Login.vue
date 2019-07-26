@@ -63,8 +63,7 @@ export default {
         .signInWithEmailAndPassword(this.username, this.password)
         .then(user => {
           this.error = '';
-          this.$emit('logged', user);
-          router.push('/orders');
+          this.checkModulesConfiguration();
         })
         .catch(e => {
           this.error = e.message;
@@ -73,7 +72,49 @@ export default {
         .then(() => {
           this.inRequest = false;
         });
-    }
+    },
+
+    checkModulesConfiguration: async function(){
+      let currentUser = firebase.auth().currentUser.email;
+      if(!currentUser){
+        return false;
+      }
+      //console.log('currentUser > ',currentUser);
+      const USER_MODULES = await this.getModulesConfig(currentUser);
+      if(!USER_MODULES){
+        console.error('Error al obtener modulos del usuario >> ',e);
+        alert('ERR #2');
+        return false;
+      }
+
+      //console.log('USER_MODULES >> ',USER_MODULES);
+      this.$emit('logged', USER_MODULES);
+      router.push('/orders');
+    },
+
+    getModulesConfig: async function(user){
+      let data = [];
+      const LIST = await this
+                    .db.collection('Company')
+                    .doc(user)
+                    .get();
+
+      let tempModules = LIST.data().ModuleConfiguration;
+
+      const NAMES = await this
+                    .db.collection('Modules')
+                    .get();
+
+      NAMES.docs.forEach(m => {
+        if(tempModules.indexOf(m.id) !== -1){
+          data.push(m.data().name);
+        }
+      });
+
+      return data;
+    },
+
+
   },
 
   mounted: function(){
