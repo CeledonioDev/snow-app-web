@@ -1,11 +1,12 @@
 <template>
   <div>
-    <h2>Aqui se cargaran las ordenes</h2>
+    <h4>Listado de ordenes</h4>
+    <button class="btn btn-danger" @click="sendDesktopNotification()">Notify</button>
     <div class="twrap">
       <table class="table">
         <thead class="text-primary">
           <th>Fecha</th>
-          <th class="text-center">Estado</th>
+          <th class="text-center">Descripcion</th>
           <th class="text-center">Mesa</th>
           <th class="text-center">Total</th>
           <th class="text-center">Detalles</th>
@@ -19,7 +20,7 @@
 
           <tr v-for="o in orders" v-bind:key="o.id">
             <td>{{ o.date }}</td>
-            <td class="text-center">{{ o.status }}</td>
+            <td class="text-center" v-html="o.service"></td>
             <td class="text-center">{{ o.table }}</td>
             <td class="text-center">{{ o.total }}</td>
             <td class="text-center"><a href="#">Ver</a></td>
@@ -32,12 +33,12 @@
 
 <script>
 import firebase from "firebase";
-import Navbar from '@/components/Navbar'
+//import Navbar from '@/components/Navbar'
 
 export default {
   name: "Orders",
   components: {
-    Navbar
+
   },
   props: {
     company_id: String
@@ -56,14 +57,14 @@ export default {
         .doc(this.company)
         .collection("Orders")
         .get();
-
       ORDERS.docs.forEach(o => {
         this.orders.push({
           id: o.id,
           date: this.formatDate(o.data().date),
           status: o.data().status,
-          table: o.data().table,
-          total: o.data().total,
+          table: o.data().table == '' ? 'N/D' : o.data().table,
+          total: this.$helpers.asMoney(o.data().total),
+          service: this.getServiceNames(o.data().service)
         });
       });
     },
@@ -72,11 +73,76 @@ export default {
       return typeof d.to_show === 'undefined'
             ? new Date(d).toLocaleString()
             : d.to_show;
+    },
+
+    getServiceNames: function(json){
+      const arr = JSON.parse(json);
+      let data = '';
+      let name = '';
+      arr.forEach((s, i) => {
+        name = `<span class="badge badge-warning">
+                  ${s.order.service}
+                  <span class="badge badge-danger">
+                    ${s.order.quantity} x ${s.order.price}
+                  </span>
+                </span>`;
+
+        data += ((i === 0 ? '' : ' ') + name);
+      });
+      return data;
+    },
+
+    sendDesktopNotification: function(total){
+      total = total || 0.0;
+      // https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification#Parameters
+      this.$notification.show('Nueva orden', {
+        body: 'Total RD$ '+total,
+        icon: '@/assets/logo.png',
+        image: '@/assets/logo.png'
+      }, {})
+        
+    },
+    
+    verifyIfOrderLoaded: function(id){
+      let exists = false;
+      this.orders.forEach(o => {
+        if(o.id === id){
+          exists = true;
+          return;
+        }
+      });
+      return exists;
+    },
+
+    listenForNewOrders: function(){
+      this.db
+      .collection("Company")
+      .doc(this.company)
+      .collection("Orders")
+      .onSnapshot((snapshot) => {
+          snapshot.docs.forEach(o => {
+            if(!this.verifyIfOrderLoaded(o.id)){
+              this.sendDesktopNotification(o.total);
+              this.orders.push({
+                id: o.id,
+                date: this.formatDate(o.data().date),
+                status: o.data().status,
+                table: o.data().table == '' ? 'N/D' : o.data().table,
+                total: this.$helpers.asMoney(o.data().total),
+                service: this.getServiceNames(o.data().service)
+              });
+            }
+          });        
+      });      
     }
+
   },
-  mounted: function() {
-    this.getOrders();
-  }
+  mounted: async function() {
+    await this.getOrders();
+
+    this.listenForNewOrders();
+
+  },
 };
 </script>
 
