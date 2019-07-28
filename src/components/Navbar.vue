@@ -76,7 +76,12 @@
                   <span class="navbar-toggler-bar bar3"></span>
                 </button>
               </div>
-              <a class="navbar-brand" href="#pablo">SnowEats</a>
+              <a class="navbar-brand" href="#pablo">
+                {{ getTodayDate() }}
+                <b>
+                  {{ time }}
+                </b>
+              </a>
             </div>
             <button
               class="navbar-toggler"
@@ -146,12 +151,25 @@ export default {
   },
   data:function(){
     return {
-      user: 'USUARIO 1'
+      user: 'USUARIO 1',
+      time: '00:00'
     }
   },
 
   beforeMount: function(){
-    console.log('from navbar userModules >> ',this.userModules);
+    setInterval(() => {
+      this.time = this.$helpers.getTime();  
+    }, 1000);
+  },
+
+  methods: {
+    
+    getTodayDate: function(){
+      const d = new Date();
+      let day = d.getUTCDate();
+      let month = d.getUTCMonth()+1;
+      return this.$helpers.getDayName(d.getDay())+' '+day+' de '+ this.$helpers.getMonthName(month);
+    },
   },
 
   mounted: function() {

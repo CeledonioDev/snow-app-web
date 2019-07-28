@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h4>Listado de ordenes</h4>
-    <button class="btn btn-danger" @click="sendDesktopNotification()">Notify</button>
+    <h4>Ordenes de hoy</h4>
+
     <div class="twrap">
       <table class="table">
         <thead class="text-primary">
@@ -9,7 +9,7 @@
           <th class="text-center">Descripcion</th>
           <th class="text-center">Mesa</th>
           <th class="text-center">Total</th>
-          <th class="text-center">Detalles</th>
+          <th class="text-center">Completada</th>
         </thead>
         <tbody>
           <tr v-show="orders.length === 0">
@@ -23,7 +23,12 @@
             <td class="text-center" v-html="o.service"></td>
             <td class="text-center">{{ o.table }}</td>
             <td class="text-center">{{ o.total }}</td>
-            <td class="text-center"><a href="#">Ver</a></td>
+            <td class="text-center">
+              <label class="switch">
+                <input type="checkbox"/>
+                <span class="slider"></span>
+              </label>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -60,7 +65,7 @@ export default {
       ORDERS.docs.forEach(o => {
         this.orders.push({
           id: o.id,
-          date: this.formatDate(o.data().date),
+          date: this.$helpers.getTime(o.data().date),
           status: o.data().status,
           table: o.data().table == '' ? 'N/D' : o.data().table,
           total: this.$helpers.asMoney(o.data().total),
@@ -70,9 +75,7 @@ export default {
     },
 
     formatDate: function(d){
-      return typeof d.to_show === 'undefined'
-            ? new Date(d).toLocaleString()
-            : d.to_show;
+      return new Date(d).toLocaleTimeString();
     },
 
     getServiceNames: function(json){
@@ -94,7 +97,7 @@ export default {
 
     sendDesktopNotification: function(total){
       total = total || 0.0;
-      // https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification#Parameters
+
       this.$notification.show('Nueva orden', {
         body: 'Total RD$ '+total,
         icon: '@/assets/logo.png',
@@ -134,7 +137,7 @@ export default {
             }
           });        
       });      
-    }
+    },
 
   },
   mounted: async function() {
