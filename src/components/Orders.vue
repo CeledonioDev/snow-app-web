@@ -18,14 +18,14 @@
             </td>
           </tr>
 
-          <tr v-for="o in orders" v-bind:key="o.id">
+          <tr v-for="o in orders" v-bind:key="o.id" :class="o.status == 1 ? 'flashit' : ''">
             <td>{{ o.date }}</td>
             <td class="text-center" v-html="o.service"></td>
-            <td class="text-center">{{ o.table }}</td>
+            <td class="text-center"><i class="badge badge-success big-f">{{ o.table }}</i></td>
             <td class="text-center">{{ o.total }}</td>
             <td class="text-center">
               <label class="switch">
-                <input type="checkbox"/>
+                <input type="checkbox" :checked="o.status" @change="updateOrderStatus(o.id, o.status)">
                 <span class="slider"></span>
               </label>
             </td>
@@ -61,21 +61,12 @@ export default {
         .collection("Company")
         .doc(this.company)
         .collection("Orders")
+        .where('date', '<', 1564203458226)
         .get();
-      ORDERS.docs.forEach(o => {
-        this.orders.push({
-          id: o.id,
-          date: this.$helpers.getTime(o.data().date),
-          status: o.data().status,
-          table: o.data().table == '' ? 'N/D' : o.data().table,
-          total: this.$helpers.asMoney(o.data().total),
-          service: this.getServiceNames(o.data().service)
-        });
-      });
-    },
 
-    formatDate: function(d){
-      return new Date(d).toLocaleTimeString();
+      ORDERS.forEach(o => {
+        this.orders.push(this.buildOrder(o));
+      });
     },
 
     getServiceNames: function(json){
@@ -126,18 +117,45 @@ export default {
           snapshot.docs.forEach(o => {
             if(!this.verifyIfOrderLoaded(o.id)){
               this.sendDesktopNotification(o.total);
-              this.orders.push({
-                id: o.id,
-                date: this.formatDate(o.data().date),
-                status: o.data().status,
-                table: o.data().table == '' ? 'N/D' : o.data().table,
-                total: this.$helpers.asMoney(o.data().total),
-                service: this.getServiceNames(o.data().service)
-              });
+              this.orders.unshift(this.buildOrder(o));
             }
           });        
       });      
     },
+
+    buildOrder: function(o){
+      return {
+          id: o.id,
+          date: this.$helpers.getTime(o.data().date),
+          status: o.data().status,
+          table: o.data().table == '' ? 'N/D' : o.data().table,
+          total: this.$helpers.asMoney(o.data().total),
+          service: this.getServiceNames(o.data().service)
+      };
+    },
+
+    updateOrderStatus: async function(oId, oldStatus){
+      try{
+        const newStatus = (oldStatus == '0' ? '1' : '0');
+        const ORDER = await this.db
+          .collection("Company")
+          .doc(this.company)
+          .collection("Orders")
+          .doc(oId)
+          .set({
+            status: newStatus
+          }, {merge: true});
+
+          this.orders.forEach(o => {
+            if(o.id === oId){
+              o.status = newStatus;
+              return;
+            }
+          });
+      }catch(e){
+        console.error(e);
+      }
+    }
 
   },
   mounted: async function() {
@@ -155,4 +173,25 @@ export default {
   max-height: 300px;
   overflow-y: auto;
 }
+/* Flash class and keyframe animation */
+.flashit{
+  background-color:#f2f;
+	-webkit-animation: flash linear 1s infinite;
+	animation: flash linear 1s infinite;
+}
+@-webkit-keyframes flash {
+	0% { opacity: 1; } 
+	50% { opacity: .1; } 
+	100% { opacity: 1; }
+}
+@keyframes flash {
+	0% { opacity: 1; } 
+	50% { opacity: .1; } 
+	100% { opacity: 1; }
+}
+
+.big-f{
+  font-size: large !important;
+}
+
 </style>

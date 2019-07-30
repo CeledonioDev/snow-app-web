@@ -7,6 +7,7 @@ export default {
 
 function asMoney(amount) {
   try {
+    amount = String(amount).replace('$','').replace(',','');
     let decimalCount = 2;
     let decimal = ".";
     let thousands = ",";
