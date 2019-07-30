@@ -49,7 +49,22 @@
             </div>
           </div>        
       </div>
-
+      <div v-else-if="currentReport == 2" class="twrap">
+        <table class="table">
+          <thead>
+            <th>Producto</th>
+            <th class="text-center">Cantidad vendida</th>
+            <th class="text-center">Total vendido(RD$)</th>
+          </thead>
+          <tbody>
+            <tr v-for="p in productsReport.products" :key="p.id">
+              <td>{{ p.name }}</td>
+              <td class="text-center">{{ p.totalQuantity }}</td>
+              <td class="text-center">{{ $helpers.asMoney(p.totalSales) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
     </div>
   </div>
@@ -80,6 +95,9 @@ export default {
         total: 0,
         month: 7
       },
+      productsReport: {
+        products: []
+      },
       loaders: {
         ordersReport: false
       }
@@ -96,7 +114,6 @@ export default {
 
     //===========================================
     //reporte de ordenes
-    //===========================================
     ordersReport: async function() {
       //funciones constructoras
       function YearReport() {
@@ -131,7 +148,7 @@ export default {
           if (typeof report[date.year].months[date.month] === "undefined") {
             obj = new MonthReport();
             obj.total += currentTotal;
-            obj.name = this.getMonthName(date.month);
+            obj.name = this.$helpers.getMonthName(date.month);
             report[date.year].months[date.month] = obj;
             if (
               typeof report[date.year].months[date.month].days[date.day] ===
@@ -139,7 +156,7 @@ export default {
             ) {
               obj = new Object();
               obj.total = currentTotal;
-              obj.name = this.getDayName(date.day);
+              obj.name = this.$helpers.getDayName(date.day);
               report[date.year].months[date.month].days[date.day] = obj;
             } else {
               report[date.year].months[date.month].days[
@@ -154,7 +171,7 @@ export default {
             ) {
               obj = new Object();
               obj.total = currentTotal;
-              obj.name = this.getDayName(date.day);
+              obj.name = this.$helpers.getDayName(date.day);
               report[date.year].months[date.month].days[date.day] = obj;
             } else {
               report[date.year].months[date.month].days[
@@ -167,7 +184,7 @@ export default {
           if (typeof report[date.year].months[date.month] === "undefined") {
             obj = new MonthReport();
             obj.total += currentTotal;
-            obj.name = this.getMonthName(date.month);
+            obj.name = this.$helpers.getMonthName(date.month);
             report[date.year].months[date.month] = obj;
             if (
               typeof report[date.year].months[date.month].days[date.day] ===
@@ -175,7 +192,7 @@ export default {
             ) {
               obj = new Object();
               obj.total = currentTotal;
-              obj.name = this.getDayName(date.day);
+              obj.name = this.$helpers.getDayName(date.day);
               report[date.year].months[date.month].days[date.day] = obj;
             } else {
               report[date.year].months[date.month].days[
@@ -190,7 +207,7 @@ export default {
             ) {
               obj = new Object();
               obj.total = currentTotal;
-              obj.name = this.getDayName(date.day);
+              obj.name = this.$helpers.getDayName(date.day);
               report[date.year].months[date.month].days[date.day] = obj;
             } else {
               report[date.year].months[date.month].days[
@@ -221,7 +238,7 @@ export default {
             output[data[mes].days[day].name] = data[mes].days[day].total;
           }
         }
-        this.ordersReportDetail.total = this.asMoney(data[MONTH].total);
+        this.ordersReportDetail.total = this.$helpers.asMoney(data[MONTH].total);
       }
       //l('output for july 2019 >> ',output);
       let labels = Object.keys(output);
@@ -244,6 +261,7 @@ export default {
     },
 
     getRealTotalValue: function(total) {
+      total = String(total);
       let val = 0;
       if (total.includes("$")) val = total.replace("$", "");
       if (total.includes(",")) val = val.replace(",", "");
@@ -251,8 +269,8 @@ export default {
       return parseInt(val);
     },
 
-
     paintOrdersReport: function(labels, dataSet) {
+      let self = this;
       var ctx = document
         .getElementById("orders-report-canvas")
         .getContext("2d");
@@ -295,10 +313,59 @@ export default {
                 }
               }
             ]
-          }
+          },
+          tooltips: {
+              enabled: true,
+              mode: 'single',
+              callbacks: {
+                  label: function(tooltipItems, data) { 
+                      return `RD$${self.$helpers.asMoney(tooltipItems.yLabel)}`;
+                  }
+              }
+          },
         }
       });
     },
+    //===========================================
+
+    //===========================================
+    // productos mas vendidos
+    getProducts: async function(){
+      this.productsReport.products = [];
+      const P = await this.db
+        .collection("Company")
+        .doc(this.company)
+        .collection("Products")
+        .orderBy('name')
+        .get();
+      P.docs.forEach(p => {
+        this.productsReport.products.push({
+          id: p.id,
+          name: p.data().name,
+          price: p.data().price,
+          totalQuantity: 0,
+          totalSales: 0
+        });
+      });
+
+      const orders = await this.getCompanyOrders();
+      orders.docs.forEach(o => {
+        this.countServiceInOrder(o.data().service);
+      });
+    },
+
+    countServiceInOrder: function(order){
+      let orderServices = JSON.parse(order);
+      orderServices.forEach(s => {
+        this.productsReport.products.forEach(p => {
+          if(p.name == s.order.service){
+            p.totalSales += parseInt(s.order.price) * parseInt(s.order.quantity);
+            p.totalQuantity += parseInt(s.order.quantity);
+          }
+        });
+      });
+    }
+
     //===========================================
   },
   mounted: function() {},
@@ -307,6 +374,8 @@ export default {
       console.log("currentReport ", value);
       if (value == 1) {
         this.ordersReport();
+      }else if(value == 2){
+        this.getProducts();
       }
     }
   }
