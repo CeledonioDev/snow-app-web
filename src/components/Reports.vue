@@ -50,7 +50,7 @@
           </div>        
       </div>
       <div v-else-if="currentReport == 2" class="twrap">
-        <table class="table">
+        <table class="table" id="dtBasicExample">
           <thead>
             <th>Producto</th>
             <th class="text-center">Cantidad vendida</th>
@@ -352,6 +352,9 @@ export default {
       orders.docs.forEach(o => {
         this.countServiceInOrder(o.data().service);
       });
+
+      //$('#dtBasicExample').DataTable();
+      //$('.dataTables_length').addClass('bs-select');
     },
 
     countServiceInOrder: function(order){
@@ -368,7 +371,10 @@ export default {
 
     //===========================================
   },
-  mounted: function() {},
+  mounted: function() {
+
+
+  },
   watch: {
     currentReport: function(value) {
       console.log("currentReport ", value);
@@ -380,6 +386,11 @@ export default {
     }
   }
 };
+
+$(document).ready(function () {
+
+});
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

@@ -61,7 +61,7 @@ export default {
         .collection("Company")
         .doc(this.company)
         .collection("Orders")
-        .where('date', '<', 1564203458226)
+        //.where('date', '<', 1564203458226)
         .get();
 
       ORDERS.forEach(o => {
@@ -100,7 +100,8 @@ export default {
     verifyIfOrderLoaded: function(id){
       let exists = false;
       this.orders.forEach(o => {
-        if(o.id === id){
+        if(o.id == id){
+          //console.log('order already loaded');
           exists = true;
           return;
         }
@@ -114,12 +115,15 @@ export default {
       .doc(this.company)
       .collection("Orders")
       .onSnapshot((snapshot) => {
-          snapshot.docs.forEach(o => {
-            if(!this.verifyIfOrderLoaded(o.id)){
-              this.sendDesktopNotification(o.total);
-              this.orders.unshift(this.buildOrder(o));
+        snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+              let data = change.doc.data();
+              if(!this.verifyIfOrderLoaded(change.doc.id)){
+                this.sendDesktopNotification(data.total);
+                this.orders.unshift(this.buildOrder(change.doc));
+              }
             }
-          });        
+        });        
       });      
     },
 
