@@ -55,7 +55,7 @@
             </li>
             <li v-if="userModules.indexOf('Inventory') !== -1"
               :class="$route.name=='inventory'?'active':''">
-              <router-link to="/products">
+              <router-link to="/inventory">
                 <i class="fa fa-building"></i>
                 <p>Inventario</p>
               </router-link>
