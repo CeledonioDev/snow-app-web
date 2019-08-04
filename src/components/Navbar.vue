@@ -50,6 +50,12 @@
                 <p>Reportes</p>
               </router-link>
             </li>
+               <li :class="$route.name=='user'?'active':''">
+              <router-link to="/user">
+                <i class="fa fa-user"></i>
+                <p>Usuarios</p>
+              </router-link>
+            </li>
           </ul>
         </div>
       </div>

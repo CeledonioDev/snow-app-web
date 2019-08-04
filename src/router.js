@@ -5,6 +5,8 @@ import Products from './components/Products.vue'
 import Orders from './components/Orders.vue'
 import Reports from './components/Reports.vue'
 import Login from './components/Login.vue'
+import User from './components/User.vue'
+
 import firebase from 'firebase'
 
 Vue.use(Router)
@@ -55,7 +57,15 @@ let router = new Router({
       meta: {
         requiresAuth: false
       }
-    }     
+    },  
+    {
+      path: '/User',
+      name: 'User',
+      component: User,
+      meta: {
+        requiresAuth: false
+      }
+    }   
   ]
 })
 
