@@ -265,10 +265,7 @@ export default {
 		},
 
 		deleteItemFromInventory: async function(ingredient){
-			l('deleteItemFromInventory >> ',ingredient);
-			if(!this.inventory.company){
-				return false;
-			}
+			console.log('deleteItemFromInventory >> ',ingredient);
 
 			const CONFIRMATION = await swal({
 				title: "Estas seguro?",
@@ -279,32 +276,30 @@ export default {
 			});
 
 			if (CONFIRMATION) {
-				this.loaders.inventory = true;
+				this.loading = true;
 				try{
 					const FROM_INGREDIENT = await this
-					.FIREBASE
 					.db
 					.collection("Company")
-					.doc(this.inventory.company)
+					.doc(this.company)
 					.collection('Ingredients')
 					.doc(ingredient)
 					.delete();
 	
 					const FROM_INVETORY = await this
-					.FIREBASE
 					.db
 					.collection("Company")
-					.doc(this.inventory.company)
+					.doc(this.company)
 					.collection('Inventory')
 					.doc(ingredient)
 					.delete();
 					
-					this.inventory.list = this.inventory.list.filter(i => i.id !== ingredient);
+					this.ingredientsList = this.ingredientsList.filter(i => i.id !== ingredient);
 
-					this.loaders.inventory = false;
+					this.loading = false;
 				}catch(e){
-					l('ERR > ',e);
-					this.loaders.inventory = false;
+					console.log('ERR > ',e);
+					this.loading = false;
 				}
 			} 
 		},

@@ -8,6 +8,7 @@ import firebaseConfig from './firebaseConfig.js'
 import Toasted from 'vue-toasted';
 import Helpers from './helpers.js';
 import VueNativeNotification from 'vue-native-notification'
+import swal from 'sweetalert';
 
 Vue.use(VueNativeNotification, {
   // Automatic permission request before
