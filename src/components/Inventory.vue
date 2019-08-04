@@ -21,7 +21,7 @@
     <div class="row">
       <div class="col-sm-12 list">
         <table class="table">
-          <thead>
+          <thead class="">
             <tr>
               <th>Ingrediente</th>
               <th>En almacen</th>
@@ -61,11 +61,6 @@
         </div>
       </div>
       <div class="col-sm-9 text-right">
-        <button 
-        @click.prevent="closeInventory()" 
-        type="button" 
-        class="btn btn-secondary"
-        >Cancelar</button>
         <button
           type="button"
           class="btn btn-primary"
@@ -87,7 +82,7 @@
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            Agregar ingrediente al inventario
+            <h4>Agregar ingrediente al inventario</h4>            
           </div>
           <div class="modal-body">
 
@@ -259,7 +254,7 @@ export default {
 			.then((ok) => {
 				if (ok) {
 					//reset
-					l('reset inventory for company ',company);
+					console.log('reset inventory for company ',company);
 				} 
 			});
 		},
@@ -305,20 +300,19 @@ export default {
 		},
 
 		updateInventory: async function(){
-			this.loaders.inventory = true;
+			this.loading = true;
 			
 			const objInventory = {};
 			
-			this.inventory.list.forEach(i => {
+			this.ingredientsList.forEach(i => {
 				objInventory[i.id] = i.quantity;
 			});
 
 			try{
 				const INVENTORY_REF = await this
-					.FIREBASE
 					.db
 					.collection("Company")
-					.doc(this.inventory.company)
+					.doc(this.company)
 					.collection('Inventory');
 
 				let list = await INVENTORY_REF.get();
@@ -336,13 +330,15 @@ export default {
 					}
 
 				});	
-				this.notify('Inventario actualizado');					
+        
+        swal('Inventario actualizado');
+        				
 			}catch(e){
-				l('ERR > ',e);
+				console.log('ERR > ',e);
 				this.notify('Error al actualizar inventario','danger');				
 			}
 
-			this.loaders.inventory = false;
+			this.loading= false;
 		},
 
 		closeInventory: function(){
