@@ -42,6 +42,9 @@ function getDayName(day) {
   let name = "N/D";
   day = String(day);
   switch (day) {
+    case "0":
+      name = "Domingo";
+      break;
     case "1":
       name = "Lunes";
       break;
@@ -59,9 +62,6 @@ function getDayName(day) {
       break;
     case "6":
       name = "Sabado";
-      break;
-    case "7":
-      name = "Domingo";
       break;
   }
   return name;
