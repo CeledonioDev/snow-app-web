@@ -250,6 +250,23 @@ exports.send_push = FUNCTIONS.https.onRequest((req, res) => {
 
 });
 
+exports.check_product_availability = FUNCTIONS.https.onRequest(async (req, res) => {
+  L('check_product_availability :in:');
+  
+  const product_id = req.query.product_id ? req.query.product_id.trim() : false;
+  const entity = req.query.entity ? req.query.entity.trim() : false;
+  
+  if(!product_id){    
+		L('check_product_availability :err: missing params');
+		res.status(400).json({
+			data: 'Missing parameres (product_id)'
+		});
+	}
+
+	//const VALID_ORDER = await checkIfProductsHaveStock(entity, serviceDetails);
+
+});
+
 async function checkProductAvailability(entity, ingredientId, quantity){
 	L('checkProductAvailability :in: ',entity, ingredientId, quantity);
 	const INVENTORY = await DB
