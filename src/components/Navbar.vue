@@ -175,7 +175,7 @@ export default {
   mounted: function() {
     let user = firebase.auth().currentUser;
     if(user){
-      this.user = user.email;
+      this.user = user.email.split('@')[0];
     }
   }
   
