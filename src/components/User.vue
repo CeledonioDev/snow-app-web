@@ -18,9 +18,9 @@
             </td>
           </tr>
           <tr v-for="i in info" v-bind:key="i.id">
-            <td class="text-center">{{i.name}}</td>
-            <td class="text-center">{{i.tel}}</td>
-            <td class="text-center">{{i.username}}</td>
+            <td class="text-center">{{ i.name }}</td>
+            <td class="text-center">{{ i.tel }}</td>
+            <td class="text-center">{{ i.username }}</td>
           </tr>
         </tbody>
       </table>
@@ -158,20 +158,21 @@ import { async } from "q";
 export default {
   name: "Info",
   props: {
-    company_id: String
+    // company_id: String
   },
   data: function() {
     return {
       Users: firebase.auth().currentUser.email,
       info: [],
       db: firebase.firestore(),
-      storage: firebase.storage().ref("Company"),
+    //   storage: firebase.storage().ref("Company"),
       correo: '',
       password: '',
       modalOptions: {
         keyboard: false,
         backdrop: false
       },
+      company_id : '',
       name: '',
       tel:'',
       username: '',
@@ -213,6 +214,7 @@ export default {
       }
       this.loaders.info = true;
       let data = {
+        company_id : this.company_id,
         name: this.name,
         tel: this.tel,
         username: this.username
@@ -246,7 +248,7 @@ export default {
       $("#user-modal").modal(this.modalOptions);
     },
     getUsers: async function() {
-      this.info = [];
+    //   this.info = [];
       const INFO = await this.db
         .collection("Users")
         .doc(this.Users)
@@ -254,17 +256,17 @@ export default {
         .get();
 
       INFO.docs.forEach(i => {
-           console.log(i.data().name);
         this.info.push({
-          //   company_id: i.company_id,
-          id: p.id,
+          id: i.id,
           name: i.data().name,
           tel: i.data().tel,
           username: i.data().username
         });
       });
     },
-
+    mounted: function(){
+        this.getUsers();
+    },
     closeUserModal: function() {
       this.cleanProductFields();
       this.cleanIngredients();
