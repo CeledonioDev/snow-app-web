@@ -7,11 +7,22 @@
     <div class="twrap">
       <table class="table">
         <thead class="thead-dark">
-          <th>Correo</th>
           <th>Nombre Completo</th>
-          <th>Telefono</th>
+          <th>Teléfono</th>
           <th>Nombre Usuario</th>
         </thead>
+        <tbody>
+          <tr v-show="info.length === 0">
+            <td class="text-center" colspan="3">
+              <div class="lds-hourglass"></div>
+            </td>
+          </tr>
+          <tr v-for="i in info" v-bind:key="i.id">
+            <td class="text-center">{{i.name}}</td>
+            <td class="text-center">{{i.tel}}</td>
+            <td class="text-center">{{i.username}}</td>
+          </tr>
+        </tbody>
       </table>
     </div>
     <!-- Inicio Modal -->
@@ -101,14 +112,14 @@
                         <div class="col-md-6">
                           <div class="form-group">
                             <label>Nombre Completo</label>
-                            <input type="text" v-model="nombre" class="form-control" />
+                            <input type="text" v-model="name" class="form-control" />
                           </div>
                         </div>
 
                         <div class="col-md-6">
                           <div class="form-group">
                             <label>Telefono</label>
-                            <input type="text" v-model="telefono" class="form-control" />
+                            <input type="text" v-model="tel" class="form-control" />
                           </div>
                         </div>
                       </div>
@@ -116,12 +127,12 @@
                         <div class="col-md-6">
                           <div class="form-group">
                             <label>Nombre Usuario</label>
-                            <input type="text" v-model="nomUsuario" class="form-control" />
+                            <input type="text" v-model="username" class="form-control" />
                           </div>
                         </div>
                         <div class="col-md-6">
                           <div class="form-group">
-                            <button class="btn btn-sucess">
+                            <button class="btn btn-sucess" @click="saveUser()">
                               <i class="fa fa-save"></i>
                               Guardar Registro
                             </button>
@@ -142,34 +153,116 @@
 </template>
 <script>
 import firebase from "firebase";
+import { async } from "q";
 
 export default {
-  name: "user",
+  name: "Info",
+  props: {
+    company_id: String
+  },
   data: function() {
     return {
-      correo : '',
+      Users: firebase.auth().currentUser.email,
+      info: [],
+      db: firebase.firestore(),
+      storage: firebase.storage().ref("Company"),
+      correo: '',
       password: '',
       modalOptions: {
         keyboard: false,
         backdrop: false
+      },
+      name: '',
+      tel:'',
+      username: '',
+      
+      loaders: {
+        info: false
       }
     };
   },
   methods: {
-   
-   registerauthentication: function(e){
-       firebase.auth().createUserWithEmailAndPassword(this.correo,this.password)
-       .then(user =>{
-           alert(`Cuenta Creada por ${user.correo}`);
-           this.$router.push('/');
-       },
-       err=>{
-           alert(err.message);
-       })
-       e.preventDefault();
-   },
+    registerauthentication: function(e) {
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(this.correo, this.password)
+        .then(
+          user => {
+            alert(`Cuenta Creada por ${user.correo}`);
+            // this.$router.push("/");
+          },
+          err => {
+            alert(err.message);
+          }
+        );
+      e.preventDefault();
+    },
+    notify: function(msg, color) {
+      try {
+        //alert(msg);
+        this.$toasted.show(msg);
+      } catch (e) {
+        console.error(e);
+        alert(msg);
+      }
+    },
+    saveUser: async function() {
+      if (this.name.length < 5) {
+        this.notify("El nombre ingresado es muy corto.", "danger");
+        return false;
+      }
+      this.loaders.info = true;
+      let data = {
+        name: this.name,
+        tel: this.tel,
+        username: this.username
+      };
+
+      try {
+        const NEW_USER = await this.db
+          .collection("Users")
+          .doc(this.Users)
+          .collection("info")
+          .add(data);
+
+        // this.info.push({
+        //     id = this.company_id
+        // });
+
+        // this.cleanUsuerFields();
+        this.notify("Registor de Usuario Completado");
+        this.loaders.info = false;
+        this.getUsers();
+      } catch (e) {
+        this.notify("Error del Servidor");
+      }
+    },
+    cleanUsuerFields: function() {
+      this.name = "";
+      this.tel = "";
+      this.username = "";
+    },
     openModal: function() {
       $("#user-modal").modal(this.modalOptions);
+    },
+    getUsers: async function() {
+      this.info = [];
+      const INFO = await this.db
+        .collection("Users")
+        .doc(this.Users)
+        .collection("Info")
+        .get();
+
+      INFO.docs.forEach(i => {
+           console.log(i.data().name);
+        this.info.push({
+          //   company_id: i.company_id,
+          id: p.id,
+          name: i.data().name,
+          tel: i.data().tel,
+          username: i.data().username
+        });
+      });
     },
 
     closeUserModal: function() {
