@@ -12,6 +12,7 @@
           <span class="simple-text logo-normal" :title="user">
             {{ user }}
           </span>
+          <span class="badge badge-primary">PLAN INICIAL</span>
         </div>
 
         <div class="sidebar-wrapper">

@@ -25,7 +25,7 @@
             <td class="text-center"><b>{{ o.total }}</b></td>
             <td class="text-center">
               <label class="switch">
-                <input type="checkbox" :checked="o.status" @change="updateOrderStatus(o.id, o.status)">
+                <input type="checkbox" :checked="!!o.status" @change="updateOrderStatus(o.id, o.status)">
                 <span class="slider"></span>
               </label>
             </td>
@@ -166,6 +166,8 @@ export default {
     await this.getOrders();
 
     this.listenForNewOrders();
+
+    console.log(firebase.auth().currentUser);
 
   },
 };
