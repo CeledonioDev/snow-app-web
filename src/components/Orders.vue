@@ -1,7 +1,14 @@
 <template>
-  <div>
-    <h4>Ordenes de hoy</h4>
-
+  <div>    
+    <div class="row">
+      <div class="col-8"><h4>Ordenes de hoy</h4></div>
+      <div class="col-4 text-right">
+        <label class="switch" title="Ocultar completadas">          
+          <input type="checkbox" v-model="hideCompleted">
+          <span class="slider"></span>
+        </label>        
+      </div>
+    </div>
     <div class="twrap">
       <table class="table">
         <thead class="text-primary">
@@ -18,7 +25,11 @@
             </td>
           </tr>
 
-          <tr v-for="o in orders" v-bind:key="o.id" :class="o.status == 1 ? 'flashit' : ''">
+          <tr v-for="o in orders" 
+            v-bind:key="o.id" 
+            :class="o.status == 1 ? 'flashit' : ''"
+            v-show="!(hideCompleted && o.status != 1)">
+
             <td>{{ o.date }}</td>
             <td class="text-center" v-html="o.service"></td>
             <td class="text-center"><i class="badge badge-success big-f">{{ o.table }}</i></td>
@@ -29,6 +40,7 @@
                 <span class="slider"></span>
               </label>
             </td>
+
           </tr>
         </tbody>
       </table>
@@ -52,7 +64,8 @@ export default {
     return {
       company: firebase.auth().currentUser.email,
       orders: [],
-      db: firebase.firestore()
+      db: firebase.firestore(),
+      hideCompleted: false
     };
   },
   methods: {
@@ -75,9 +88,12 @@ export default {
       let name = '';
       arr.forEach((s, i) => {
         name = `<span class="badge badge-warning">
+                  <span class="badge badge-danger">
+                  ${s.order.quantity}
+                  </span>
                   ${s.order.service}
                   <span class="badge badge-danger">
-                    ${s.order.quantity} x ${s.order.price}
+                     ${s.order.price} C/U
                   </span>
                 </span>`;
 
@@ -168,6 +184,12 @@ export default {
     this.listenForNewOrders();
 
   },
+
+  watch: {
+    hideCompleted: function(value){
+      console.log('hideCompleted ',value);
+    }
+  }
 };
 </script>
 

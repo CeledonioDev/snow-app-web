@@ -12,6 +12,7 @@
           <th>Categoria</th>
           <th>Ìngredientes</th>
           <th>Descripcion</th>
+          <th></th>  
         </thead>
         <tbody>
           <tr v-show="products.length === 0">
@@ -26,6 +27,11 @@
             <td class="text-center">{{ p.category_id }}</td>
             <td class="text-center">{{ p.ingredient }}</td>
             <td class="">{{ p.description }}</td>
+            <td>
+              <a title="Eliminar producto" @click="deleteProduct(p.id)" href="#" class="text-danger">
+                <i class="fa fa-trash fa-2x"></i>
+              </a>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -607,6 +613,10 @@ export default {
 
     addCategory: function(){
       $("#category-modal").modal(this.modalOptions);
+    },
+
+    deleteProduct: function(id){
+      console.log('deleteProduct >> ',id);
     }
         
   },
