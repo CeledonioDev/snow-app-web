@@ -214,7 +214,7 @@ export default {
       }
       this.loaders.info = true;
       let data = {
-        company_id : this.company_id,
+        company_id : this.correo,
         name: this.name,
         tel: this.tel,
         username: this.username
@@ -223,7 +223,7 @@ export default {
       try {
         const NEW_USER = await this.db
           .collection("Users")
-          .doc(this.Users)
+          .doc(this.correo)
           .collection("info")
           .add(data);
 
