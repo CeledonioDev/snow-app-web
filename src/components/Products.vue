@@ -15,13 +15,13 @@
         </thead>
         <tbody>
           <tr v-show="products.length === 0">
-            <td class="text-center" colspan="3">
+            <td class="text-center" colspan="5">
               <div class="lds-hourglass"></div>
             </td>
           </tr>
 
           <tr v-for="p in products" v-bind:key="p.id">
-            <td>{{ p.name }}</td>
+            <td><b>{{ p.name }}</b></td>
             <td class="text-center">{{ p.price }}</td>
             <td class="text-center">{{ p.category_id }}</td>
             <td class="text-center">{{ p.ingredient }}</td>

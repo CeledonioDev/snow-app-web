@@ -13,16 +13,16 @@
         </thead>
         <tbody>
           <tr v-show="orders.length === 0">
-            <td class="text-center" colspan="3">
+            <td class="text-center" colspan="5">
               <div class="lds-hourglass"></div>
             </td>
           </tr>
 
           <tr v-for="o in orders" v-bind:key="o.id" :class="o.status == 1 ? 'flashit' : ''">
-            <td>{{ o.date }}</td>
+            <td><b>{{ o.date }}</b></td>
             <td class="text-center" v-html="o.service"></td>
             <td class="text-center"><i class="badge badge-success big-f">{{ o.table }}</i></td>
-            <td class="text-center">{{ o.total }}</td>
+            <td class="text-center"><b>{{ o.total }}</b></td>
             <td class="text-center">
               <label class="switch">
                 <input type="checkbox" :checked="o.status" @change="updateOrderStatus(o.id, o.status)">
@@ -174,7 +174,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .twrap{
-  max-height: 300px;
+  max-height: 60vh;
   overflow-y: auto;
 }
 /* Flash class and keyframe animation */
