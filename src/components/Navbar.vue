@@ -3,35 +3,20 @@
       <div id="nav" class="sidebar" data-color="white" data-active-color="danger">
         <!--Tip 1: You can change the color of the sidebar using: data-color="blue | green | orange | red | yellow"-->
         <div class="logo">
-          <a href class="simple-text logo-mini">
+          <a href="#" class="simple-text logo-mini">
             <div class="logo-image-small">
               <img src="../assets/logo.png" />
             </div>
           </a>
 
-          <a href class="simple-text logo-normal" :title="user">
+          <span class="simple-text logo-normal" :title="user">
             {{ user }}
-            <!-- <div class="logo-image-big">
-            <img src="../assets/img/logo-big.png">
-            </div>-->
-          </a>
+          </span>
+          <span class="badge badge-primary">PLAN INICIAL</span>
         </div>
 
         <div class="sidebar-wrapper">
           <ul class="nav">
-            <!-- <li :class="$route.name=='home'?'active':''">
-              <router-link to="/">
-                <i class="fa fa-dashboard"></i>
-                <p>Panel de control</p>
-              </router-link>
-            </li> -->
-            <!-- Comentado hasta encontrar una manera de poner un usuario super admin -->
-            <!-- <li :class="$route.name=='companies'?'active':''">
-              <router-link to="/companies">
-                <i class="fa fa-building"></i>
-                <p>Afiliados</p>
-              </router-link>
-            </li> -->
             <li v-if="userModules.indexOf('Orders') !== -1"  
               :class="$route.name=='orders'?'active':''">
               <router-link to="/orders">
@@ -112,6 +97,7 @@
 						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
 							<a class="dropdown-item" href="#"><i class="fa fa-bell"></i>&nbsp;Notificaciones</a>
 							<a class="dropdown-item" href="#"><i class="fa fa-cog"></i>&nbsp;Configuraciones</a>
+              <a @click="logout()" class="dropdown-item" href="#"><i class="fa fa-sign-out"></i>&nbsp;Salir</a>
 						</div>
 					</li>
 
@@ -143,6 +129,7 @@
 
 <script>
 import firebase from 'firebase'
+import router from '../router.js'
 
 export default {
   name: 'Navbar',
@@ -170,6 +157,12 @@ export default {
       let month = d.getUTCMonth()+1;
       return this.$helpers.getDayName(d.getDay())+' '+day+' de '+ this.$helpers.getMonthName(month);
     },
+
+    logout: function(){
+      firebase.auth().signOut();
+      window.location.assign('login')
+    }
+
   },
 
   mounted: function() {
