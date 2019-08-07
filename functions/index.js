@@ -253,46 +253,60 @@ exports.send_push = FUNCTIONS.https.onRequest((req, res) => {
 exports.check_product_availability = FUNCTIONS.https.onRequest(async (req, res) => {
   L('check_product_availability :in:');
   
-  const product_id = req.query.product_id ? req.query.product_id.trim() : false;
+  const service_detail = req.query.service_detail ? req.query.service_detail : false;
   const entity = req.query.entity ? req.query.entity.trim() : false;
   
-  if(!product_id){    
+  if(!service_detail){    
 		L('check_product_availability :err: missing params');
 		res.status(400).json({
-			data: 'Missing parameres (product_id)'
+			data: 'Missing parameres (service_detail)'
 		});
 	}
 
-	//const VALID_ORDER = await checkIfProductsHaveStock(entity, serviceDetails);
+	const INGREDIENTS = JSON.parse(service_detail);
+
+	for(let i = 0; i < INGREDIENTS.length; i++) {
+		if(!checkProductAvailability(entity, INGREDIENTS[i].id, INGREDIENTS[i].quantity)){
+			L('check_product_availability :process: not enought ingredients');
+			res.status(400).json({
+				data: {
+					message: 'Not enought ingredients',
+					ingredient_id: INGREDIENTS[i].id
+				}
+			});
+		}
+	}
+
+	L('check_product_availability :out: ok');
+	res.status(200).json({
+		data: 'Ok'
+	});
 
 });
 
 async function checkProductAvailability(entity, ingredientId, quantity){
 	L('checkProductAvailability :in: ',entity, ingredientId, quantity);
-	const INVENTORY = await DB
+	const INVENTORY = DB
 										.collection('Company')
 										.doc(entity)
 										.collection('Inventory')
-										.doc(ingredientId)
-										.get();
-	const QUANTITY_IN_STOCK = parseInt(INVENTORY.data().quantity);
+										.doc(ingredientId);
+										//.get();
+	const IN_STOCK = await INVENTORY.get();
+
+	const QUANTITY_IN_STOCK = parseInt(IN_STOCK.data().quantity);
 	quantity = parseInt(quantity);
 	
 	if(quantity > QUANTITY_IN_STOCK){
 		return Promise.resolve(false);
 	}
+
 	const NEW_QUANTITY = String(QUANTITY_IN_STOCK - quantity);
 	L('NEW_QUANTITY >> ',NEW_QUANTITY);
 
-	const UPDATE_QUANTITY = await
-													DB
-													.collection('Company')
-													.doc(entity)
-													.collection('Inventory')
-													.doc(ingredientId)
-													.set({
-														quantity: NEW_QUANTITY
-													}, { merge: true });
+	await INVENTORY.set({
+		quantity: NEW_QUANTITY
+	}, { merge: true });
 
 	return Promise.resolve(true);
 }
@@ -316,6 +330,7 @@ async function checkIfProductsHaveStock(entity, serviceDetails){
 		let ingredientId = 0;
 		
 		for(let i = 0; i < products.length; i++){
+
 			for(let j = 0; j < products[i].ingredients.length; j++){
 				
 				ingredientId = products[i].ingredients[j].ingredient_id;
@@ -327,6 +342,7 @@ async function checkIfProductsHaveStock(entity, serviceDetails){
 					throw 'Not enought';
 				}
 			}
+
 		}
 		status = true;
 	}catch(e){
