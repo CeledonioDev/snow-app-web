@@ -139,6 +139,8 @@ img{
 #bg{
   background-image: url('../assets/bg.jpg');
   height: -webkit-fill-available;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .login-page {
