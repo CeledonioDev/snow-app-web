@@ -183,8 +183,6 @@ export default {
 
     this.listenForNewOrders();
 
-    console.log(firebase.auth().currentUser);
-
   },
 
   watch: {
