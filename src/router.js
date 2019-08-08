@@ -8,6 +8,7 @@ import Login from './components/Login.vue'
 import User from './components/User.vue'
 
 import firebase from 'firebase'
+import Inventory from './components/Inventory.vue'
 
 Vue.use(Router)
 
@@ -65,7 +66,15 @@ let router = new Router({
       meta: {
         requiresAuth: false
       }
-    }   
+    },
+    {
+      path: '/inventory',
+      name: 'inventory',
+      component: Inventory,
+      meta: {
+        requiresAuth: false
+      }
+    }
   ]
 })
 

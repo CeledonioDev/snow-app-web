@@ -3,57 +3,52 @@
       <div id="nav" class="sidebar" data-color="white" data-active-color="danger">
         <!--Tip 1: You can change the color of the sidebar using: data-color="blue | green | orange | red | yellow"-->
         <div class="logo">
-          <a href class="simple-text logo-mini">
+          <a href="#" class="simple-text logo-mini">
             <div class="logo-image-small">
               <img src="../assets/logo.png" />
             </div>
           </a>
 
-          <a href class="simple-text logo-normal" :title="user">
+          <span class="simple-text logo-normal" :title="user">
             {{ user }}
-            <!-- <div class="logo-image-big">
-            <img src="../assets/img/logo-big.png">
-            </div>-->
-          </a>
+          </span>
+          <span class="badge badge-primary">PLAN INICIAL</span>
         </div>
 
         <div class="sidebar-wrapper">
           <ul class="nav">
-            <!-- <li :class="$route.name=='home'?'active':''">
-              <router-link to="/">
-                <i class="fa fa-dashboard"></i>
-                <p>Panel de control</p>
-              </router-link>
-            </li> -->
-            <!-- Comentado hasta encontrar una manera de poner un usuario super admin -->
-            <!-- <li :class="$route.name=='companies'?'active':''">
-              <router-link to="/companies">
-                <i class="fa fa-building"></i>
-                <p>Afiliados</p>
-              </router-link>
-            </li> -->
-            <li :class="$route.name=='orders'?'active':''">
+            <li v-if="userModules.indexOf('Orders') !== -1"  
+              :class="$route.name=='orders'?'active':''">
               <router-link to="/orders">
                 <i class="fa fa-shopping-cart"></i>
                 <p>Ordenes</p>
               </router-link>
             </li>
-            <li :class="$route.name=='products'?'active':''">
+            <li v-if="userModules.indexOf('Products') !== -1"  
+              :class="$route.name=='products'?'active':''">
               <router-link to="/products">
                 <i class="fa fa-cutlery"></i>
                 <p>Productos</p>
               </router-link>
             </li>
-            <li :class="$route.name=='reports'?'active':''">
+            <li v-if="userModules.indexOf('Reports') !== -1" 
+              :class="$route.name=='reports'?'active':''">
               <router-link to="/reports">
                 <i class="fa fa-line-chart"></i>
                 <p>Reportes</p>
               </router-link>
             </li>
-               <li :class="$route.name=='user'?'active':''">
+            <li :class="$route.name=='user'?'active':''">
               <router-link to="/user">
                 <i class="fa fa-user"></i>
                 <p>Usuarios</p>
+              </router-link>
+            </li>   
+            <li v-if="userModules.indexOf('Inventory') !== -1"
+              :class="$route.name=='inventory'?'active':''">
+              <router-link to="/inventory">
+                <i class="fa fa-building"></i>
+                <p>Inventario</p>
               </router-link>
             </li>
           </ul>
@@ -72,7 +67,12 @@
                   <span class="navbar-toggler-bar bar3"></span>
                 </button>
               </div>
-              <a class="navbar-brand" href="#pablo">SnowEats</a>
+              <a class="navbar-brand" href="#pablo">
+                {{ getTodayDate() }}
+                <b>
+                  {{ time }}
+                </b>
+              </a>
             </div>
             <button
               class="navbar-toggler"
@@ -103,6 +103,7 @@
 						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
 							<a class="dropdown-item" href="#"><i class="fa fa-bell"></i>&nbsp;Notificaciones</a>
 							<a class="dropdown-item" href="#"><i class="fa fa-cog"></i>&nbsp;Configuraciones</a>
+              <a @click="logout()" class="dropdown-item" href="#"><i class="fa fa-sign-out"></i>&nbsp;Salir</a>
 						</div>
 					</li>
 
@@ -134,21 +135,46 @@
 
 <script>
 import firebase from 'firebase'
+import router from '../router.js'
 
 export default {
   name: 'Navbar',
   props: {
-    //module: String
+    userModules: Array
   },
   data:function(){
     return {
-      user: 'USUARIO 1'
+      user: 'USUARIO 1',
+      time: '00:00'
     }
   },
+
+  beforeMount: function(){
+    setInterval(() => {
+      this.time = this.$helpers.getTime();  
+    }, 1000);
+  },
+
+  methods: {
+    
+    getTodayDate: function(){
+      const d = new Date();
+      let day = d.getUTCDate();
+      let month = d.getUTCMonth()+1;
+      return this.$helpers.getDayName(d.getDay())+' '+day+' de '+ this.$helpers.getMonthName(month);
+    },
+
+    logout: function(){
+      firebase.auth().signOut();
+      window.location.assign('login')
+    }
+
+  },
+
   mounted: function() {
     let user = firebase.auth().currentUser;
     if(user){
-      this.user = user.email;
+      this.user = user.email.split('@')[0];
     }
   }
   

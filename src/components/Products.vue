@@ -12,20 +12,26 @@
           <th>Categoria</th>
           <th>Ìngredientes</th>
           <th>Descripcion</th>
+          <th></th>  
         </thead>
         <tbody>
           <tr v-show="products.length === 0">
-            <td class="text-center" colspan="3">
+            <td class="text-center" colspan="5">
               <div class="lds-hourglass"></div>
             </td>
           </tr>
 
           <tr v-for="p in products" v-bind:key="p.id">
-            <td>{{ p.name }}</td>
+            <td><b>{{ p.name }}</b></td>
             <td class="text-center">{{ p.price }}</td>
             <td class="text-center">{{ p.category_id }}</td>
             <td class="text-center">{{ p.ingredient }}</td>
             <td class="">{{ p.description }}</td>
+            <td>
+              <a title="Eliminar producto" @click="deleteProduct(p.id)" href="#" class="text-danger">
+                <i class="fa fa-trash fa-2x"></i>
+              </a>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -263,9 +269,7 @@
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title">Agregar categoria</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
+       
               </div>
               <div class="modal-body">
 
@@ -295,7 +299,7 @@
                     </div>
                   </div>
                   <div class="col-sm-9 text-right">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" @click="closeCategoryModal()">Cancelar</button>
                     <button :disabled="loaders.category" type="button" class="btn btn-primary"
                       @click.prevent="saveCategory()">Guardar</button>
                   </div>
@@ -323,7 +327,7 @@ export default {
     return {
       company: firebase.auth().currentUser.email,
       products: [],
-      db: firebase.firestore(),
+      db: firebase.firestore().collection("Company").doc(firebase.auth().currentUser.email),
       storage: firebase.storage().ref('Company'),
       modalOptions: {
         keyboard: false,
@@ -391,10 +395,7 @@ export default {
 			}
 
 			try {
-				const NEW_PRODUCT = await this
-					.db
-					.collection("Company")
-					.doc(this.company)
+				const NEW_PRODUCT = await this.db
 					.collection('Products')
 					.doc()
 					.set(data);
@@ -447,8 +448,6 @@ export default {
     getProducts: async function() {
       this.products = [];
       const PRODUCTS = await this.db
-        .collection("Company")
-        .doc(this.company)
         .collection("Products")
         .get();
 
@@ -477,10 +476,7 @@ export default {
     getCategories: async function () {
 			this.categories = [];
 
-      const CATEGORIES = await this
-        .db
-        .collection("Company")
-        .doc(this.company)
+      const CATEGORIES = await this.db
         .collection('Category')
         .get();
 
@@ -499,10 +495,7 @@ export default {
     getIngredients: async function () {
 			this.ingredients = [];
 
-      const INGREDIENTS = await this
-        .db
-        .collection("Company")
-        .doc(this.company)
+      const INGREDIENTS = await this.db
         .collection('Inventory')
         .get();
 
@@ -551,10 +544,7 @@ export default {
 			};
 
 			try {
-				const NEW_CATEGORY = await this
-					.db
-					.collection("Company")
-					.doc(this.company)
+				const NEW_CATEGORY = await this.db
 					.collection('Category')
 					.add(data);
 
@@ -607,6 +597,29 @@ export default {
 
     addCategory: function(){
       $("#category-modal").modal(this.modalOptions);
+    },
+
+    deleteProduct: function(id){
+      console.log('deleteProduct >> ',id);
+      swal({
+				title: "Estas seguro?",
+				text: "El producto se eliminara",
+				icon: "warning",
+				buttons: true,
+				dangerMode: true,
+			})
+			.then((ok) => {
+				if (ok) {
+          this.db.collection('Products').doc(id).delete();
+          this.products = this.products.filter(p => p.id !== id);
+				} 
+			});
+    },
+
+    closeCategoryModal: function(){
+      this.category.name = '';
+      $('#category-modal').modal('hide');
+
     }
         
   },

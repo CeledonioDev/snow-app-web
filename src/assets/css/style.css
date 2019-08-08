@@ -118,3 +118,12 @@ input:checked + .slider:before {
   -ms-transform: translateX(26px);
   transform: translateX(26px);
 }
+
+.badge{
+  font-size: 84% !important;
+}
+
+.card .card-body{
+  padding-top: 1px;
+}
+
