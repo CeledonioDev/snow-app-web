@@ -214,7 +214,7 @@ export default {
       }
       this.loaders.info = true;
       let data = {
-        company_id : this.correo,
+        company_id : this.Users,
         name: this.name,
         tel: this.tel,
         username: this.username
@@ -251,8 +251,8 @@ export default {
     //   this.info = [];
       const INFO = await this.db
         .collection("Users")
-        .doc(this.Users)
-        .collection("Info")
+        .doc(this.correo)
+        .collection("info")
         .get();
 
       INFO.docs.forEach(i => {
