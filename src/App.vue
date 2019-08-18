@@ -1,9 +1,9 @@
 <template>
   <div id="app">
     
-    <Login v-if="!authenticated" v-on:logged="authenticated=true"/>
+    <Login v-if="!authenticated" v-on:logged="catchLogin($event)"/>
     
-    <Navbar v-if="authenticated" />
+    <Navbar v-if="appReady" :userModules="modules"/>
 
   </div>
 </template>
@@ -25,9 +25,26 @@ export default {
   },
   data: function(){
     return {
-      authenticated: false
+      authenticated: false,
+      appReady: false,
+      modules: []
     }
   },
+
+  methods:{
+    catchLogin: function(userModules){
+      //console.log('catchLogin >> ',userModules);
+      this.authenticated = true;
+      this.modules = userModules;
+      this.appReady = true;
+    }
+  },
+
+  watch: {
+    authenticated: function(){
+
+    }
+  }
 };
 
 

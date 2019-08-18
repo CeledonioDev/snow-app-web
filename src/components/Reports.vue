@@ -18,17 +18,17 @@
             </div>
             <div class="col-sm-8">
               <select v-model="ordersReportDetail.month" class="form-control">
-                <option :value="7" selected>Julio</option>
+                <option v-for="m in months" :key="m.id" :value="m.id" selected>{{ m.name }}</option>
               </select>
             </div>
-            <div class="col-sm-2">
+            <!-- <div class="col-sm-2">
               <button
                 class="btn btn-default report-refresh"
                 style="padding: 5px;	margin-top: auto; "
               >
                 <li class="fa fa-refresh fa-2x"></li>
               </button>
-            </div>
+            </div> -->
         </div>
       </div>
 
@@ -49,7 +49,22 @@
             </div>
           </div>        
       </div>
-
+      <div v-else-if="currentReport == 2" class="twrap">
+        <table class="table" id="dtBasicExample">
+          <thead>
+            <th>Producto</th>
+            <th class="text-center">Cantidad vendida</th>
+            <th class="text-center">Total vendido(RD$)</th>
+          </thead>
+          <tbody>
+            <tr v-for="p in productsReport.products" :key="p.id">
+              <td>{{ p.name }}</td>
+              <td class="text-center">{{ p.totalQuantity }}</td>
+              <td class="text-center">{{ $helpers.asMoney(p.totalSales) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
     </div>
   </div>
@@ -80,9 +95,15 @@ export default {
         total: 0,
         month: 7
       },
+      productsReport: {
+        products: []
+      },
       loaders: {
         ordersReport: false
-      }
+      },
+      months: [],
+      ordersReportCache: null
+
     };
   },
   methods: {
@@ -96,8 +117,16 @@ export default {
 
     //===========================================
     //reporte de ordenes
-    //===========================================
-    ordersReport: async function() {
+    ordersReport: function() {
+      if(this.ordersReportCache !== null){
+        this.processReportData(this.ordersReportCache);
+      }else{
+        this.buildOrdersReport();
+      }
+
+    },
+
+    buildOrdersReport: async function(){
       //funciones constructoras
       function YearReport() {
         this.months = {};
@@ -119,11 +148,15 @@ export default {
       let obj = null;
 
       ORDERS.forEach(order => {
+        
         date = this.getTimestampDetails(order.id);
+        
         currentTotal = this.getRealTotalValue(order.data().total);
-        if (order.data().service.length < 10) {
+        
+        if (order.data().service.length < 10) {//si el servicio esta incompleto, ignoralo
           return;
         }
+
         if (typeof report[date.year] === "undefined") {
           obj = new YearReport();
           obj.total += currentTotal;
@@ -131,15 +164,20 @@ export default {
           if (typeof report[date.year].months[date.month] === "undefined") {
             obj = new MonthReport();
             obj.total += currentTotal;
-            obj.name = this.getMonthName(date.month);
+            obj.name = this.$helpers.getMonthName(date.month);
             report[date.year].months[date.month] = obj;
+            //agregar el mes al combo
+            this.months.push({
+              id: date.month,
+              name: obj.name
+            });
             if (
               typeof report[date.year].months[date.month].days[date.day] ===
               "undefined"
             ) {
               obj = new Object();
               obj.total = currentTotal;
-              obj.name = this.getDayName(date.day);
+              obj.name = this.$helpers.getDayName(date.day);
               report[date.year].months[date.month].days[date.day] = obj;
             } else {
               report[date.year].months[date.month].days[
@@ -154,7 +192,7 @@ export default {
             ) {
               obj = new Object();
               obj.total = currentTotal;
-              obj.name = this.getDayName(date.day);
+              obj.name = this.$helpers.getDayName(date.day);
               report[date.year].months[date.month].days[date.day] = obj;
             } else {
               report[date.year].months[date.month].days[
@@ -164,18 +202,24 @@ export default {
           }
         } else {
           report[date.year].total += currentTotal;
+
           if (typeof report[date.year].months[date.month] === "undefined") {
             obj = new MonthReport();
             obj.total += currentTotal;
-            obj.name = this.getMonthName(date.month);
+            obj.name = this.$helpers.getMonthName(date.month);
             report[date.year].months[date.month] = obj;
+            //agregar el mes al combo
+            this.months.push({
+              id: date.month,
+              name: obj.name
+            });
             if (
               typeof report[date.year].months[date.month].days[date.day] ===
               "undefined"
             ) {
               obj = new Object();
               obj.total = currentTotal;
-              obj.name = this.getDayName(date.day);
+              obj.name = this.$helpers.getDayName(date.day);
               report[date.year].months[date.month].days[date.day] = obj;
             } else {
               report[date.year].months[date.month].days[
@@ -190,7 +234,7 @@ export default {
             ) {
               obj = new Object();
               obj.total = currentTotal;
-              obj.name = this.getDayName(date.day);
+              obj.name = this.$helpers.getDayName(date.day);
               report[date.year].months[date.month].days[date.day] = obj;
             } else {
               report[date.year].months[date.month].days[
@@ -200,12 +244,12 @@ export default {
           }
         }
       });
-      //l('ordersReport >> ', report);
-      this.processReportData(report);
+      this.ordersReportCache = report;
+      this.processReportData(report);      
     },
 
     processReportData: function(rawData) {
-      //prueba con el mes de julio del 2019
+      //console.log('processReportData >> ', rawData);
       let data = {};
       let output = {};
       const MONTH = this.ordersReportDetail.month.toString();
@@ -213,15 +257,10 @@ export default {
       if (rawData["2019"]) {
         data = rawData["2019"].months;
         let monthName = "";
-        for (let mes in data) {
-          if (data.hasOwnProperty(mes) && mes !== "total") {
-            monthName = data[mes].name;
-          }
-          for (let day in data[mes].days) {
-            output[data[mes].days[day].name] = data[mes].days[day].total;
-          }
+        for (let day in data[MONTH].days) {
+          output[data[MONTH].days[day].name] = data[MONTH].days[day].total;
         }
-        this.ordersReportDetail.total = this.asMoney(data[MONTH].total);
+        this.ordersReportDetail.total = this.$helpers.asMoney(data[MONTH].total);
       }
       //l('output for july 2019 >> ',output);
       let labels = Object.keys(output);
@@ -233,7 +272,7 @@ export default {
     getTimestampDetails: function(timestamp) {
       const date = new Date(parseInt(timestamp));
       return {
-        day: this.addLeadingZero(date.getDay() + 1).toString(),
+        day: this.addLeadingZero(date.getDay()).toString(),
         month: this.addLeadingZero(date.getMonth() + 1).toString(),
         year: date.getFullYear().toString()
       };
@@ -244,6 +283,7 @@ export default {
     },
 
     getRealTotalValue: function(total) {
+      total = String(total);
       let val = 0;
       if (total.includes("$")) val = total.replace("$", "");
       if (total.includes(",")) val = val.replace(",", "");
@@ -251,80 +291,8 @@ export default {
       return parseInt(val);
     },
 
-    getDayName: function(day) {
-      let name = "N/D";
-
-      switch (day) {
-        case "1":
-          name = "Lunes";
-          break;
-        case "2":
-          name = "Martes";
-          break;
-        case "3":
-          name = "Miercoles";
-          break;
-        case "4":
-          name = "Jueves";
-          break;
-        case "5":
-          name = "Viernes";
-          break;
-        case "6":
-          name = "Sabado";
-          break;
-        case "7":
-          name = "Domingo";
-          break;
-      }
-      return name;
-    },
-
-    getMonthName: function(month) {
-      let name = "N/D";
-
-      switch (month) {
-        case "1":
-          name = "Enero";
-          break;
-        case "2":
-          name = "Febrero";
-          break;
-        case "3":
-          name = "Marzo";
-          break;
-        case "4":
-          name = "Abril";
-          break;
-        case "5":
-          name = "Mayo";
-          break;
-        case "6":
-          name = "Junio";
-          break;
-        case "7":
-          name = "Julio";
-          break;
-        case "8":
-          name = "Agosto";
-          break;
-        case "9":
-          name = "Septiembre";
-          break;
-        case "10":
-          name = "Octubre";
-          break;
-        case "11":
-          name = "Noviembre";
-          break;
-        case "12":
-          name = "Diciembre";
-          break;
-      }
-      return name;
-    },
-
     paintOrdersReport: function(labels, dataSet) {
+      let self = this;
       var ctx = document
         .getElementById("orders-report-canvas")
         .getContext("2d");
@@ -367,53 +335,93 @@ export default {
                 }
               }
             ]
-          }
+          },
+          tooltips: {
+              enabled: true,
+              mode: 'single',
+              callbacks: {
+                  label: function(tooltipItems, data) { 
+                      return `RD$${self.$helpers.asMoney(tooltipItems.yLabel)}`;
+                  }
+              }
+          },
         }
       });
     },
     //===========================================
 
-    asMoney: function(amount) {
-      try {
-        let decimalCount = 2;
-        let decimal = ".";
-        let thousands = ",";
-        decimalCount = Math.abs(decimalCount);
-        decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
+    //===========================================
+    // productos mas vendidos
+    getProducts: async function(){
+      this.productsReport.products = [];
+      const P = await this.db
+        .collection("Company")
+        .doc(this.company)
+        .collection("Products")
+        .orderBy('name')
+        .get();
+      P.docs.forEach(p => {
+        this.productsReport.products.push({
+          id: p.id,
+          name: p.data().name,
+          price: p.data().price,
+          totalQuantity: 0,
+          totalSales: 0
+        });
+      });
 
-        const negativeSign = amount < 0 ? "-" : "";
+      const orders = await this.getCompanyOrders();
+      orders.docs.forEach(o => {
+        this.countServiceInOrder(o.data().service);
+      });
 
-        let i = parseInt(
-          (amount = Math.abs(Number(amount) || 0).toFixed(decimalCount))
-        ).toString();
-        let j = i.length > 3 ? i.length % 3 : 0;
+      //$('#dtBasicExample').DataTable();
+      //$('.dataTables_length').addClass('bs-select');
+    },
 
-        return (
-          negativeSign +
-          (j ? i.substr(0, j) + thousands : "") +
-          i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) +
-          (decimalCount
-            ? decimal +
-              Math.abs(amount - i)
-                .toFixed(decimalCount)
-                .slice(2)
-            : "")
-        );
-      } catch (e) {
-        console.log(e);
-      }
+    countServiceInOrder: function(order){
+      let orderServices = JSON.parse(order);
+      orderServices.forEach(s => {
+        this.productsReport.products.forEach(p => {
+          if(p.name == s.order.service){
+            p.totalSales += parseInt(s.order.price) * parseInt(s.order.quantity);
+            p.totalQuantity += parseInt(s.order.quantity);
+          }
+        });
+      });
+    },
+    //===========================================
+
+    getAvailableMonths: function(){
+      //this.months
+
     }
+
   },
-  mounted: function() {},
+  mounted: function() {
+
+
+  },
   watch: {
     currentReport: function(value) {
       console.log("currentReport ", value);
       if (value == 1) {
         this.ordersReport();
+      }else if(value == 2){
+        this.getProducts();
       }
+    },
+
+    'ordersReportDetail.month': function(value){
+      this.ordersReport();
     }
   }
 };
+
+$(document).ready(function () {
+
+});
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

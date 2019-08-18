@@ -1,6 +1,8 @@
 .DS_Store
 node_modules
 /dist
+functions/node_modules
+functions/nieveseats-firebase-adminsdk-lu3vq-b8c6651e39.json
 
 # local env files
 .env.local
