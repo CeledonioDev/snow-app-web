@@ -109,9 +109,9 @@ export default {
                     .get();
 
       NAMES.docs.forEach(m => {
-        if(tempModules.indexOf(m.id) !== -1){
-          data.push(m.data().name);
-        }
+        // if(tempModules.indexOf(m.id) !== -1){
+        //   data.push(m.data().name);
+        // }
       });
 
       return data;

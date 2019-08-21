@@ -1,15 +1,65 @@
 <template>
-  <div>    
+  <div>
     <div class="row">
-      <div class="col-8"><h4>Ordenes de hoy</h4></div>
-      <div class="col-4 text-right">
-        <label class="switch" title="Ocultar completadas">          
-          <input type="checkbox" v-model="hideCompleted">
-          <span class="slider"></span>
-        </label>        
+      <div class="col-md-8">
+        <h4>Ordenes de hoy</h4>
       </div>
-    </div>
-    <div class="twrap">
+      <div class="col-4 text-right">
+        <label class="switch" title="Ocultar completadas">
+          <input type="checkbox" v-model="hideCompleted" />
+          <span class="slider"></span>
+        </label>
+      </div>
+           <div v-for="o in orders" v-bind:key="o.id" class="col-md-6">
+          <!-- <div class="column">
+            <div class="col-md-6">
+              <div class="card" style="width:18rem">
+                <div class="card-body">
+                  <h5 class="card-title">Fecha: {{o.date}}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted"> total : {{o.total}}</h6>
+                  <p class="card-text" v-html="o.service"></p>
+                  Comopletada :  <label class="switch">
+                <input
+                  type="checkbox"
+                  :checked="!!o.status"
+                  @change="updateOrderStatus(o.id, o.status)"
+                />
+                <span class="slider"></span>
+              </label>
+                </div>
+              </div>
+            </div>
+          </div> -->
+          <div class="card text-center">
+            <div class="card-header">
+              {{o.date}}
+            </div>
+            <div class="card-body">
+              <h5 class="card-title" v-html="o.service"></h5>
+              <h6 class="card-text">Completada: 
+                <label class="switch">
+                <input
+                  type="checkbox"
+                  :checked="!!o.status"
+                  @change="updateOrderStatus(o.id, o.status)"
+                />
+                <span class="slider"></span>
+              </label></h6>
+            </div>
+            <div class="card-footer text-muted">
+              {{o.total}}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    
+
+
+   
+
+
+    <!-- <div class="twrap">
       <table class="table">
         <thead class="text-primary">
           <th>Fecha</th>
@@ -25,26 +75,34 @@
             </td>
           </tr>
 
-          <tr v-for="o in orders" 
-            v-bind:key="o.id" 
+          <tr
+            v-for="o in orders"
+            v-bind:key="o.id"
             :class="o.status == 1 ? 'flashit' : ''"
-            v-show="!(hideCompleted && o.status != 1)">
-
+            v-show="!(hideCompleted && o.status != 1)"
+          >
             <td>{{ o.date }}</td>
             <td class="text-center" v-html="o.service"></td>
-            <td class="text-center"><i class="badge badge-success big-f">{{ o.table }}</i></td>
-            <td class="text-center"><b>{{ o.total }}</b></td>
+            <td class="text-center">
+              <i class="badge badge-success big-f">{{ o.table }}</i>
+            </td>
+            <td class="text-center">
+              <b>{{ o.total }}</b>
+            </td>
             <td class="text-center">
               <label class="switch">
-                <input type="checkbox" :checked="!!o.status" @change="updateOrderStatus(o.id, o.status)">
+                <input
+                  type="checkbox"
+                  :checked="!!o.status"
+                  @change="updateOrderStatus(o.id, o.status)"
+                />
                 <span class="slider"></span>
               </label>
             </td>
-
           </tr>
         </tbody>
       </table>
-    </div>
+    </div>-->
   </div>
 </template>
 
@@ -54,9 +112,7 @@ import firebase from "firebase";
 
 export default {
   name: "Orders",
-  components: {
-
-  },
+  components: {},
   props: {
     company_id: String
   },
@@ -82,10 +138,10 @@ export default {
       });
     },
 
-    getServiceNames: function(json){
+    getServiceNames: function(json) {
       const arr = JSON.parse(json);
-      let data = '';
-      let name = '';
+      let data = "";
+      let name = "";
       arr.forEach((s, i) => {
         name = `<span class="badge badge-warning">
                   <span class="badge badge-danger">
@@ -97,26 +153,29 @@ export default {
                   </span>
                 </span>`;
 
-        data += ((i === 0 ? '' : ' ') + name);
+        data += (i === 0 ? "" : " ") + name;
       });
       return data;
     },
 
-    sendDesktopNotification: function(total){
+    sendDesktopNotification: function(total) {
       total = total || 0.0;
 
-      this.$notification.show('Nueva orden', {
-        body: 'Total RD$ '+total,
-        icon: '@/assets/logo.png',
-        image: '@/assets/logo.png'
-      }, {})
-        
+      this.$notification.show(
+        "Nueva orden",
+        {
+          body: "Total RD$ " + total,
+          icon: "@/assets/logo.png",
+          image: "@/assets/logo.png"
+        },
+        {}
+      );
     },
-    
-    verifyIfOrderLoaded: function(id){
+
+    verifyIfOrderLoaded: function(id) {
       let exists = false;
       this.orders.forEach(o => {
-        if(o.id == id){
+        if (o.id == id) {
           //console.log('order already loaded');
           exists = true;
           return;
@@ -125,69 +184,70 @@ export default {
       return exists;
     },
 
-    listenForNewOrders: function(){
+    listenForNewOrders: function() {
       this.db
-      .collection("Company")
-      .doc(this.company)
-      .collection("Orders")
-      .onSnapshot((snapshot) => {
-        snapshot.docChanges().forEach((change) => {
+        .collection("Company")
+        .doc(this.company)
+        .collection("Orders")
+        .onSnapshot(snapshot => {
+          snapshot.docChanges().forEach(change => {
             if (change.type === "added") {
               let data = change.doc.data();
-              if(!this.verifyIfOrderLoaded(change.doc.id)){
+              if (!this.verifyIfOrderLoaded(change.doc.id)) {
                 this.sendDesktopNotification(data.total);
                 this.orders.unshift(this.buildOrder(change.doc));
               }
             }
-        });        
-      });      
+          });
+        });
     },
 
-    buildOrder: function(o){
+    buildOrder: function(o) {
       return {
-          id: o.id,
-          date: this.$helpers.getTime(o.data().date),
-          status: o.data().status,
-          table: o.data().table == '' ? 'N/D' : o.data().table,
-          total: this.$helpers.asMoney(o.data().total),
-          service: this.getServiceNames(o.data().service)
+        id: o.id,
+        date: this.$helpers.getTime(o.data().date),
+        status: o.data().status,
+        table: o.data().table == "" ? "N/D" : o.data().table,
+        total: this.$helpers.asMoney(o.data().total),
+        service: this.getServiceNames(o.data().service)
       };
     },
 
-    updateOrderStatus: async function(oId, oldStatus){
-      try{
-        const newStatus = (oldStatus == '0' ? '1' : '0');
+    updateOrderStatus: async function(oId, oldStatus) {
+      try {
+        const newStatus = oldStatus == "0" ? "1" : "0";
         const ORDER = await this.db
           .collection("Company")
           .doc(this.company)
           .collection("Orders")
           .doc(oId)
-          .set({
-            status: newStatus
-          }, {merge: true});
+          .set(
+            {
+              status: newStatus
+            },
+            { merge: true }
+          );
 
-          this.orders.forEach(o => {
-            if(o.id === oId){
-              o.status = newStatus;
-              return;
-            }
-          });
-      }catch(e){
+        this.orders.forEach(o => {
+          if (o.id === oId) {
+            o.status = newStatus;
+            return;
+          }
+        });
+      } catch (e) {
         console.error(e);
       }
     }
-
   },
   mounted: async function() {
     await this.getOrders();
 
     this.listenForNewOrders();
-
   },
 
   watch: {
-    hideCompleted: function(value){
-      console.log('hideCompleted ',value);
+    hideCompleted: function(value) {
+      console.log("hideCompleted ", value);
     }
   }
 };
@@ -195,29 +255,40 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.twrap{
+.twrap {
   max-height: 60vh;
   overflow-y: auto;
 }
 /* Flash class and keyframe animation */
-.flashit{
-  background-color:#f2f;
-	-webkit-animation: flash linear 1s infinite;
-	animation: flash linear 1s infinite;
+.flashit {
+  background-color: #f2f;
+  -webkit-animation: flash linear 1s infinite;
+  animation: flash linear 1s infinite;
 }
 @-webkit-keyframes flash {
-	0% { opacity: 1; } 
-	50% { opacity: .1; } 
-	100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.1;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 @keyframes flash {
-	0% { opacity: 1; } 
-	50% { opacity: .1; } 
-	100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.1;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
-.big-f{
+.big-f {
   font-size: large !important;
 }
-
 </style>

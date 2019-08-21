@@ -10,6 +10,7 @@ import Helpers from './helpers.js';
 import VueNativeNotification from 'vue-native-notification'
 import swal from 'sweetalert';
 
+
 Vue.use(VueNativeNotification, {
   // Automatic permission request before
   // showing notification (default: true)

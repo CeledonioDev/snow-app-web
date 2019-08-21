@@ -18,9 +18,9 @@
             </td>
           </tr>
           <tr v-for="i in info" v-bind:key="i.id">
-            <td class="text-center">{{ i.name }}</td>
-            <td class="text-center">{{ i.tel }}</td>
-            <td class="text-center">{{ i.username }}</td>
+            <td class="text-left">{{ i.name }}</td>
+            <td class="text-left">{{ i.tel }}</td>
+            <td class="text-left">{{ i.username }}</td>
           </tr>
         </tbody>
       </table>
@@ -165,18 +165,18 @@ export default {
       Users: firebase.auth().currentUser.email,
       info: [],
       db: firebase.firestore(),
-    //   storage: firebase.storage().ref("Company"),
-      correo: '',
-      password: '',
+      //   storage: firebase.storage().ref("Company"),
+      correo: "",
+      password: "",
       modalOptions: {
         keyboard: false,
         backdrop: false
       },
-      company_id : '',
-      name: '',
-      tel:'',
-      username: '',
-      
+      company_id: "",
+      name: "",
+      tel: "",
+      username: "",
+
       loaders: {
         info: false
       }
@@ -190,6 +190,7 @@ export default {
         .then(
           user => {
             alert(`Cuenta Creada por ${user.correo}`);
+            cleanUsuerFields();
             // this.$router.push("/");
           },
           err => {
@@ -214,7 +215,7 @@ export default {
       }
       this.loaders.info = true;
       let data = {
-        company_id : this.Users,
+        company_id: this.Users,
         name: this.name,
         tel: this.tel,
         username: this.username
@@ -224,15 +225,15 @@ export default {
         const NEW_USER = await this.db
           .collection("Users")
           .doc(this.correo)
-          .collection("info")
+          .collection("Info")
           .add(data);
 
         // this.info.push({
         //     id = this.company_id
         // });
 
-        // this.cleanUsuerFields();
-        this.notify("Registor de Usuario Completado");
+         this.cleanUsuerFields();
+        this.notify("Registro de Usuario Completado");
         this.loaders.info = false;
         this.getUsers();
       } catch (e) {
@@ -243,16 +244,18 @@ export default {
       this.name = "";
       this.tel = "";
       this.username = "";
+      this.correo = "";
+      this.password = "";
     },
     openModal: function() {
       $("#user-modal").modal(this.modalOptions);
     },
     getUsers: async function() {
-    //   this.info = [];
+     
       const INFO = await this.db
         .collection("Users")
-        .doc(this.correo)
-        .collection("info")
+        .doc(this.Users)
+        .collection("Info")
         .get();
 
       INFO.docs.forEach(i => {
@@ -264,14 +267,17 @@ export default {
         });
       });
     },
-    mounted: function(){
-        this.getUsers();
+    mounted: function() {
+      this.getUsers();
     },
     closeUserModal: function() {
       this.cleanProductFields();
       this.cleanIngredients();
       $("#user-modal").modal("hide");
     }
+  },
+  mounted: async function() {
+   await this.getUsers();
   }
 };
 </script>

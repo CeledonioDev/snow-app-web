@@ -16,7 +16,6 @@ import Navbar from './components/Navbar.vue'
 require("@/assets/css/bootstrap.min.css");
 require("@/assets/css/style.css");
 require("@/assets/css/paper-dashboard.css");
-
 export default {
   name: "App",
   components: {
