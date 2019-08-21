@@ -10,54 +10,29 @@
           <span class="slider"></span>
         </label>
       </div>
-           <div v-for="o in orders" v-bind:key="o.id" class="col-md-6">
-          <!-- <div class="column">
-            <div class="col-md-6">
-              <div class="card" style="width:18rem">
-                <div class="card-body">
-                  <h5 class="card-title">Fecha: {{o.date}}</h5>
-                  <h6 class="card-subtitle mb-2 text-muted"> total : {{o.total}}</h6>
-                  <p class="card-text" v-html="o.service"></p>
-                  Comopletada :  <label class="switch">
-                <input
-                  type="checkbox"
-                  :checked="!!o.status"
-                  @change="updateOrderStatus(o.id, o.status)"
-                />
-                <span class="slider"></span>
-              </label>
-                </div>
-              </div>
-            </div>
-          </div> -->
+      <div v-for="o in orders" v-bind:key="o.id" class="col-md-6">
+        <div class="container">
           <div class="card text-center">
-            <div class="card-header">
-              {{o.date}}
-            </div>
+            <div class="card-header">{{o.date}}</div>
             <div class="card-body">
               <h5 class="card-title" v-html="o.service"></h5>
-              <h6 class="card-text">Completada: 
+              <h6 class="card-text">
+                Completada:
                 <label class="switch">
-                <input
-                  type="checkbox"
-                  :checked="!!o.status"
-                  @change="updateOrderStatus(o.id, o.status)"
-                />
-                <span class="slider"></span>
-              </label></h6>
+                  <input
+                    type="checkbox"
+                    :checked="!!o.status"
+                    @change="updateOrderStatus(o.id, o.status)"
+                  />
+                  <span class="slider"></span>
+                </label>
+              </h6>
             </div>
-            <div class="card-footer text-muted">
-              {{o.total}}
-            </div>
+            <div class="card-footer text-muted">{{o.total}}</div>
           </div>
-
         </div>
       </div>
-    
-
-
-   
-
+    </div>
 
     <!-- <div class="twrap">
       <table class="table">
