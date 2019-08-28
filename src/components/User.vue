@@ -70,7 +70,7 @@
                   </li>
                 </ul>
                 <br />
-                <form>
+                <form autocomplete="off">
                   <div class="tab-content" id="myTabContent">
                     <div
                       class="tab-pane fade show active"
@@ -78,21 +78,24 @@
                       role="tabpanel"
                       aria-labelledby="home-tab"
                     >
-                      <div class="row">
+                    <div class="myForm">
+                       <div class="row">
                         <div class="col-md-6">
                           <div class="form-group">
                             <label>Correo Electronio</label>
-                            <input type="text" v-model="correo" class="form-control" />
+                            <input type="text" v-model="correo" class="form-control"  value="" />
                           </div>
                         </div>
 
                         <div class="col-md-6">
                           <div class="form-group">
                             <label>Password</label>
-                            <input type="password" v-model="password" class="form-control" />
+                            <input type="password" v-model="password" class="form-control"  value=""/>
                           </div>
                         </div>
                       </div>
+                    </div>
+                     
                       <div class="row">
                         <div class="form-group">
                           <button class="btn btn-sucess" v-on:click="registerauthentication">
@@ -152,8 +155,11 @@
   </div>
 </template>
 <script>
+
+
 import firebase from "firebase";
 import { async } from "q";
+
 
 export default {
   name: "Info",
@@ -178,10 +184,12 @@ export default {
       username: "",
 
       loaders: {
-        info: false
+        info: false,
+     
       }
     };
   },
+
   methods: {
     registerauthentication: function(e) {
       firebase
@@ -249,6 +257,8 @@ export default {
     },
     openModal: function() {
       $("#user-modal").modal(this.modalOptions);
+      this.correo = "";
+      this.password= "";
     },
     getUsers: async function() {
      
