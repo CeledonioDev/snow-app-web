@@ -24,7 +24,7 @@
                     :checked="!!o.status"
                     @change="updateOrderStatus(o.id, o.status)"
                   />
-                  <span class="slider"></span>
+                  <span class="slider"></span> 
                 </label>
               </h6>
             </div>

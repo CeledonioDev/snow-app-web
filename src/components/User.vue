@@ -226,7 +226,7 @@ export default {
           .collection("Users")
           .doc(this.correo)
           .collection("Info")
-          .add(data);
+          .set(data);
 
         // this.info.push({
         //     id = this.company_id
